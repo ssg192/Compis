@@ -6,19 +6,20 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner entradaTerminal = new Scanner(System.in);
-            if(args.length == 0) {
-                do {
-                    System.out.print("REPL-escom: ");
-                } while (!entradaTerminal.nextLine().equals("salir"));
-            }else if(args.length == 1){
-                File rutaDelArchivo = new File("/home/salvador/Escritorio/repl.txt");
+        if (args.length == 0) {
+            while (true) {
+                System.out.print("REPL-ESCOM: ");
+                if (!entradaTerminal.hasNextLine()) {
+                    break;
+                } else if (entradaTerminal.nextLine().equals("salir"))
+                    break;
+            }
+        } else if (args.length == 1) {
+            File rutaDelArchivo = new File("/home/salvador/Escritorio/repl.txt");
+            String caracteres = entradaTerminal.nextLine();
 
-            }
-            else{
-                System.out.println("Se recibió más de un argumento");
-                System.exit(1);
-            }
-            }
+        }
 
+    }
 
     }
