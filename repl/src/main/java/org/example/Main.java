@@ -20,7 +20,8 @@ public class Main {
                     break;
                 }
                 String entrada = entradaTerminal.nextLine();
-                if (entrada.equalsIgnoreCase("salir")) {
+                if (entrada.equalsIgnoreCase("/exit")) {
+                    System.out.println("Goodbye");
                     break;
                 }
                 System.out.println(entrada);
