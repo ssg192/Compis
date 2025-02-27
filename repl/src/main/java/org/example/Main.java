@@ -40,7 +40,7 @@ public class Main {
         File directorioActual = new File(".");
         File[] archivos = directorioActual.listFiles((dir, name) -> name.endsWith(".txt"));
         if (archivos == null || archivos.length == 0) {
-            throw new FileNotFoundException("Error: No se encontró ningún archivo .txt en el directorio actual.");
+            System.out.println("Error: No se encontró ningún archivo .txt en el directorio actual.");
         }
 
         File archivoALeer = archivos[0];
