@@ -8,14 +8,14 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         if (args.length > 1) {
-            System.out.println("Se recibio mas de un argumento, solo se permite 0 a 1 argumento");
+            System.out.println("Se recibió más de un argumento, solo se permite de 0 a 1 argumento");
             System.exit(1);
         }
 
         if (args.length == 0) {
             ejecutarRepl();
         } else {
-            leerArchivo("src/repl.txt");
+            leerArchivo();
         }
     }
 
@@ -36,16 +36,20 @@ public class Main {
         entradaTerminal.close();
     }
 
-    public static void leerArchivo(String ruta) throws FileNotFoundException {
-        File rutaDelArchivo = new File(ruta);
-        if (!rutaDelArchivo.exists() || !rutaDelArchivo.isFile()) {
-            System.out.println("Error: El archivo especificado no existe o no es un archivo válido.");
-            System.exit(1);
+    public static void leerArchivo() throws FileNotFoundException {
+        File directorioActual = new File(".");
+        File[] archivos = directorioActual.listFiles((dir, name) -> name.endsWith(".txt"));
+        if (archivos == null || archivos.length == 0) {
+            throw new FileNotFoundException("Error: No se encontró ningún archivo .txt en el directorio actual.");
         }
-        System.out.println(rutaDelArchivo);
-        Scanner lecturaArchivo = new Scanner(rutaDelArchivo);
+
+        File archivoALeer = archivos[0];
+        Scanner lecturaArchivo = new Scanner(archivoALeer);
+
         while (lecturaArchivo.hasNextLine()) {
             System.out.println(lecturaArchivo.nextLine());
         }
+
+        lecturaArchivo.close();
     }
 }
