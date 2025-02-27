@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         if (args.length > 1) {
-            System.out.println("Se recibió más de un argumento, solo se permite de 0 a 1 argumento");
+            System.out.println("Se recibió más de un argumento");
             System.exit(1);
         }
 
@@ -37,19 +37,27 @@ public class Main {
     }
 
     public static void leerArchivo() throws FileNotFoundException {
+        String[] extensiones = {".txt", ".csv"};
         File directorioActual = new File("/home/salvador/Escritorio/Compis/");
-        File[] archivos = directorioActual.listFiles((dir, name) -> name.endsWith(".txt"));
-        if (archivos == null || archivos.length == 0) {
-            System.out.println("Error: No se encontró ningún archivo .txt en el directorio actual.");
+        File archivoAleer = null;
+        File[] archivos = directorioActual.listFiles();
+
+        for (File archivo : archivos) {
+            for (String extensionValidas : extensiones) {
+                if (archivo.getName().endsWith(extensionValidas)) {
+                    archivoAleer = archivo;
+                    break;
+                }
+            }
         }
-
-        File archivoALeer = archivos[0];
-        Scanner lecturaArchivo = new Scanner(archivoALeer);
-
-        while (lecturaArchivo.hasNextLine()) {
-            System.out.println(lecturaArchivo.nextLine());
+        if (archivoAleer == null) {
+            System.out.println("No se encontró ningún archivo válido en el directorio.");
+        } else {
+            Scanner lecturaArchivo = new Scanner(archivoAleer);
+            while (lecturaArchivo.hasNextLine()) {
+                System.out.println(lecturaArchivo.nextLine());
+            }
+            lecturaArchivo.close();
         }
-
-        lecturaArchivo.close();
     }
 }
