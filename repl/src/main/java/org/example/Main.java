@@ -37,7 +37,7 @@ public class Main {
     }
 
     public static void leerArchivo() throws FileNotFoundException {
-        File directorioActual = new File(".");
+        File directorioActual = new File("/home/salvador/Escritorio/Compis/");
         File[] archivos = directorioActual.listFiles((dir, name) -> name.endsWith(".txt"));
         if (archivos == null || archivos.length == 0) {
             System.out.println("Error: No se encontró ningún archivo .txt en el directorio actual.");
