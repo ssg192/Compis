@@ -15,7 +15,7 @@ public class Main {
         if (args.length == 0) {
             ejecutarRepl();
         } else {
-            leerArchivo();
+            leerArchivo(args[0]);
         }
     }
 
@@ -36,28 +36,23 @@ public class Main {
         entradaTerminal.close();
     }
 
-    public static void leerArchivo() throws FileNotFoundException {
-        String[] extensiones = {".txt", ".csv"};
-        File directorioActual = new File("/home/salvador/Escritorio/Compis/");
-        File archivoAleer = null;
-        File[] archivos = directorioActual.listFiles();
+    public static void leerArchivo(String ruta) throws FileNotFoundException {
+        File archivo = new File(ruta);
 
-        for (File archivo : archivos) {
-            for (String extensionValidas : extensiones) {
-                if (archivo.getName().endsWith(extensionValidas)) {
-                    archivoAleer = archivo;
-                    break;
-                }
-            }
+        if (!archivo.exists()) {
+            System.out.println("Archivo no encontrado");
+            return;
         }
-        if (archivoAleer == null) {
-            System.out.println("No se encontró ningún archivo válido en el directorio.");
-        } else {
-            Scanner lecturaArchivo = new Scanner(archivoAleer);
-            while (lecturaArchivo.hasNextLine()) {
-                System.out.println(lecturaArchivo.nextLine());
-            }
-            lecturaArchivo.close();
+
+        if (!archivo.isFile()) {
+            System.out.println("La ruta proporcionada no es un archivo válido.");
+            return;
         }
+
+        Scanner lecturaArchivo = new Scanner(archivo);
+        while (lecturaArchivo.hasNextLine()) {
+            System.out.println(lecturaArchivo.nextLine());
+        }
+        lecturaArchivo.close();
     }
 }
