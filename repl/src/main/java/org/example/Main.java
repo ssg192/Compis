@@ -2,11 +2,10 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws FileNotFoundException {
 
         if (args.length > 1) {
             System.out.println("Se recibió más de un argumento");
@@ -20,7 +19,7 @@ public class Main {
         }
     }
 
-    public static void ejecutarRepl() throws Exception {
+    public static void ejecutarRepl() {
         Scanner entradaTerminal = new Scanner(System.in);
         while (true) {
             System.out.print("REPL-ESCOM: ");
@@ -32,20 +31,12 @@ public class Main {
                 System.out.println("Goodbye");
                 break;
             }
-
-            // Analizar la entrada usando Lector
-            Lector lector = new Lector(entrada);
-            List<Token> tokens = lector.scan();
-
-            // Imprimir los tokens generados
-            for (Token token : tokens) {
-                System.out.println(token);
-            }
+            System.out.println(entrada);
         }
         entradaTerminal.close();
     }
 
-    public static void leerArchivo(String ruta) throws Exception {
+    public static void leerArchivo(String ruta) throws FileNotFoundException {
         File archivo = new File(ruta);
 
         if (!archivo.exists()) {
@@ -60,16 +51,7 @@ public class Main {
 
         Scanner lecturaArchivo = new Scanner(archivo);
         while (lecturaArchivo.hasNextLine()) {
-            String linea = lecturaArchivo.nextLine();
-
-            // Analizar cada línea usando Lector
-            Lector lector = new Lector(linea);
-            List<Token> tokens = lector.scan();
-
-            // Imprimir los tokens generados
-            for (Token token : tokens) {
-                System.out.println(token);
-            }
+            System.out.println(lecturaArchivo.nextLine());
         }
         lecturaArchivo.close();
     }
