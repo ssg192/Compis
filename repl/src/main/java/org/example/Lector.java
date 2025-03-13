@@ -57,18 +57,18 @@ public class Lector {
                         tokens.add(new Token(TipoToken.OR, "||", linea));
                         i++;
                     } else if (Character.isLetter(preanalisis)) {
-                        estado = 6; // Identificadores y palabras reservadas
+                        estado = 6;
                         lexema = "" + preanalisis;
                     } else if (preanalisis == '"') {
-                        estado = 7; // Cadenas
+                        estado = 7;
                         lexema = "";
                     } else if (esSignoPuntuacion(preanalisis)) {
                         tokens.add(new Token(getTipoSignoPuntuacion(preanalisis), Character.toString(preanalisis), linea));
                     } else if (Character.isDigit(preanalisis)) {
-                        estado = 8; // Números
+                        estado = 8;
                         lexema = "" + preanalisis;
                     } else if (preanalisis == '=') {
-                        estado = 9; // Asignación
+                        estado = 9;
                         lexema = "" + preanalisis;
                     } else if (preanalisis == '*') {
                         tokens.add(new Token(TipoToken.STAR, "*", linea));
@@ -77,7 +77,7 @@ public class Lector {
                     }
                     break;
 
-                case 6: // Identificadores y palabras reservadas
+                case 6:
                     if (Character.isLetterOrDigit(preanalisis)) {
                         lexema += preanalisis;
                     } else {
@@ -88,14 +88,14 @@ public class Lector {
                         }
                         estado = 0;
                         lexema = "";
-                        i--; // Regresar al estado anterior
+                        i--;
                     }
                     break;
 
-                case 7: // Cadenas
+                case 7:
                     if (preanalisis == '"') {
                         tokens.add(new Token(TipoToken.CADENA, lexema, lexema, linea));
-                        estado = 0; // Regresar al estado inicial
+                        estado = 0;
                         lexema = "";
                     } else {
                         lexema += preanalisis;
@@ -106,13 +106,13 @@ public class Lector {
                     if (Character.isDigit(preanalisis)) {
                         lexema += preanalisis;
                     } else if (preanalisis == 'E' || preanalisis == 'e') {
-                        lexema += preanalisis; // Manejar notación científica
-                        estado = 10; // Cambiar a estado para exponentes
+                        lexema += preanalisis;
+                        estado = 10;
                     } else {
-                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea)); // Almacenar como String
+                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea));
                         estado = 0;
                         lexema = "";
-                        i--; // Regresar al carácter anterior
+                        i--;
                     }
                     break;
 
@@ -122,20 +122,20 @@ public class Lector {
                         tokens.add(new Token(TipoToken.EQUALS, lexema, linea));
                     } else {
                         tokens.add(new Token(TipoToken.ASSIGN, lexema, linea));
-                        i--; // Regresar al carácter anterior
+                        i--;
                     }
                     estado = 0;
                     lexema = "";
                     break;
 
-                case 10: // Manejo de exponentes
+                case 10:
                     if (Character.isDigit(preanalisis)) {
                         lexema += preanalisis;
                     } else {
-                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea)); // Almacenar como String
+                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea));
                         estado = 0;
                         lexema = "";
-                        i--; // Regresar al carácter anterior
+                        i--;
                     }
                     break;
             }
