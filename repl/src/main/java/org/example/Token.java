@@ -3,17 +3,17 @@ package org.example;
 public class Token {
     private final TipoToken tipo;
     private final String lexema;
-    private final Object valor;
+    private final Object literal;
     private final int linea;
 
     public Token(TipoToken tipo, String lexema, int linea) {
         this(tipo, lexema, null, linea);
     }
 
-    public Token(TipoToken tipo, String lexema, Object valor, int linea) {
+    public Token(TipoToken tipo, String lexema, Object literal, int linea) {
         this.tipo = tipo;
         this.lexema = lexema;
-        this.valor = valor;
+        this.literal = literal;
         this.linea = linea;
     }
 
@@ -26,7 +26,7 @@ public class Token {
     }
 
     public Object getValor() {
-        return valor;
+        return literal;
     }
 
     public int getLinea() {
@@ -35,11 +35,10 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "tipo=" + tipo +
-                ", lexema='" + lexema + '\'' +
-                ", valor=" + valor +
-                ", linea=" + linea +
-                '}';
+        if (literal != null) {
+            return "<" + tipo + ", lexema:'" + lexema + "', literal:" + literal + ", linea:" + linea + ">";
+        } else {
+            return "<" + tipo + ", lexema:'" + lexema + "', linea:" + linea + ">";
+        }
     }
 }

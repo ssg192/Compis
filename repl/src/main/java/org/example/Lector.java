@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class Lector {
 
-    private String usuario_oracion;
-    private List<Token> tokens = new ArrayList<>();
+    private final String usuario_oracion;
+    private final List<Token> tokens = new ArrayList<>();
     private static final Map<String, TipoToken> palabrasReservadas;
 
     static {
@@ -27,152 +27,104 @@ public class Lector {
     }
 
     public Lector(String usuario_oracion) {
-        this.usuario_oracion = usuario_oracion + " "; // Agregar espacio al final para detectar EOF
+        this.usuario_oracion = usuario_oracion + " ";
     }
 
     public List<Token> scan() throws Exception {
         int estado = 0;
         String lexema = "";
-        int linea = 1; // Empezamos con la primera línea
+        int linea = 1;
 
         for (int i = 0; i < usuario_oracion.length(); i++) {
             char preanalisis = usuario_oracion.charAt(i);
 
-            // Detectar saltos de línea para incrementar la línea
-            if (preanalisis == '\n') {
-                linea++;
-            }
-
             switch (estado) {
                 case 0:
-                    if (preanalisis == '>') {
-                        estado = 1;
-                        lexema += preanalisis;
-                    } else if (preanalisis == '<') {
-                        estado = 2;
-                        lexema += preanalisis;
-                    } else if (preanalisis == '!') {
-                        estado = 3;
-                        lexema += preanalisis;
-                    } else if (preanalisis == '&') {
-                        estado = 4;
-                        lexema += preanalisis;
-                    } else if (preanalisis == '|') {
-                        estado = 5;
-                        lexema += preanalisis;
+                    if (Character.isWhitespace(preanalisis)) {
+                        if (preanalisis == '\n') linea++;
+                    } else if (preanalisis == '>' && i + 1 < usuario_oracion.length() && usuario_oracion.charAt(i + 1) == '=') {
+                        tokens.add(new Token(TipoToken.GREATER_EQUAL, ">=", linea));
+                        i++;
+                    } else if (preanalisis == '<' && i + 1 < usuario_oracion.length() && usuario_oracion.charAt(i + 1) == '=') {
+                        tokens.add(new Token(TipoToken.LESS_EQUAL, "<=", linea));
+                        i++;
+                    } else if (preanalisis == '!' && i + 1 < usuario_oracion.length() && usuario_oracion.charAt(i + 1) == '=') {
+                        tokens.add(new Token(TipoToken.NOT_EQUAL, "!=", linea));
+                        i++;
+                    } else if (preanalisis == '&' && i + 1 < usuario_oracion.length() && usuario_oracion.charAt(i + 1) == '&') {
+                        tokens.add(new Token(TipoToken.AND, "&&", linea));
+                        i++;
+                    } else if (preanalisis == '|' && i + 1 < usuario_oracion.length() && usuario_oracion.charAt(i + 1) == '|') {
+                        tokens.add(new Token(TipoToken.OR, "||", linea));
+                        i++;
                     } else if (Character.isLetter(preanalisis)) {
-                        estado = 13;
-                        lexema += preanalisis;
-                    } else if (preanalisis == '"') { // Para las cadenas
                         estado = 6;
+                        lexema = "" + preanalisis;
+                    } else if (preanalisis == '"') {
+                        estado = 7;
                         lexema = "";
                     } else if (esSignoPuntuacion(preanalisis)) {
                         tokens.add(new Token(getTipoSignoPuntuacion(preanalisis), Character.toString(preanalisis), linea));
-                    } else if (Character.isDigit(preanalisis)) { // Números
-                        estado = 7;
+                    } else if (Character.isDigit(preanalisis)) {
+                        estado = 8;
+                        lexema = "" + preanalisis;
+                    } else if (preanalisis == '=') {
+                        estado = 9;
                         lexema = "" + preanalisis;
                     }
                     break;
 
-                case 1: // Manejar '>' y '>='
-                    if (preanalisis == '=') {
-                        lexema += preanalisis;
-                        tokens.add(new Token(TipoToken.GREATER_EQUAL, lexema, linea));
-                    } else {
-                        tokens.add(new Token(TipoToken.GREATER, ">", linea));
-                        i--;
-                    }
-                    estado = 0;
-                    lexema = "";
-                    break;
-
-                case 2: // Manejar '<' y '<='
-                    if (preanalisis == '=') {
-                        lexema += preanalisis;
-                        tokens.add(new Token(TipoToken.LESS_EQUAL, lexema, linea));
-                    } else {
-                        tokens.add(new Token(TipoToken.LESS, "<", linea));
-                        i--;
-                    }
-                    estado = 0;
-                    lexema = "";
-                    break;
-
-                case 3: // Manejar '!' y '!='
-                    if (preanalisis == '=') {
-                        lexema += preanalisis;
-                        tokens.add(new Token(TipoToken.NOT_EQUAL, lexema, linea));
-                    } else {
-                        tokens.add(new Token(TipoToken.NOT, "!", linea));
-                        i--;
-                    }
-                    estado = 0;
-                    lexema = "";
-                    break;
-
-                case 4: // Manejar '&' y '&&'
-                    if (preanalisis == '&') {
-                        lexema += preanalisis;
-                        tokens.add(new Token(TipoToken.AND, lexema, linea));
-                    } else {
-                        throw new Exception("Error léxico: '&' no es un token válido");
-                    }
-                    estado = 0;
-                    lexema = "";
-                    break;
-
-                case 5: // Manejar '|' y '||'
-                    if (preanalisis == '|') {
-                        lexema += preanalisis;
-                        tokens.add(new Token(TipoToken.OR, lexema, linea));
-                    } else {
-                        throw new Exception("Error léxico: '|' no es un token válido");
-                    }
-                    estado = 0;
-                    lexema = "";
-                    break;
-
-                case 6: // Manejo de cadenas (texto entre comillas)
-                    if (preanalisis == '"') { // Fin de la cadena
-                        tokens.add(new Token(TipoToken.CADENA, lexema, lexema, linea));
-                        estado = 0; // Regresamos al estado inicial
-                    } else {
-                        lexema += preanalisis; // Continuamos leyendo la cadena
-                    }
-                    break;
-
-                case 7: // Números
-                    if (Character.isDigit(preanalisis) || preanalisis == '.') {
-                        lexema += preanalisis;
-                    } else {
-                        tokens.add(new Token(TipoToken.NUMBER, lexema, Double.parseDouble(lexema), linea));
-                        estado = 0;
-                        lexema = "";
-                        i--;
-                    }
-                    break;
-
-                case 13: // Identificadores y palabras reservadas
+                case 6:
                     if (Character.isLetterOrDigit(preanalisis)) {
                         lexema += preanalisis;
                     } else {
-                        TipoToken tt = palabrasReservadas.get(lexema);
-                        if (tt == null) {
-                            tokens.add(new Token(TipoToken.ID, lexema, linea));
+                        if (palabrasReservadas.containsKey(lexema)) {
+                            tokens.add(new Token(palabrasReservadas.get(lexema), lexema, linea));
                         } else {
-                            tokens.add(new Token(tt, lexema, linea));
+                            tokens.add(new Token(TipoToken.ID, lexema, null, linea));
                         }
                         estado = 0;
                         lexema = "";
                         i--;
                     }
                     break;
+
+                case 7:
+                    if (preanalisis == '"') {
+                        tokens.add(new Token(TipoToken.QUOTES, lexema, lexema, linea));
+                        estado = 0;
+                        lexema = "";
+                    } else {
+                        lexema += preanalisis;
+                    }
+                    break;
+
+                case 8:
+                    if (Character.isDigit(preanalisis)) {
+                        lexema += preanalisis;
+                    } else {
+                        tokens.add(new Token(TipoToken.NUMBER, lexema, Integer.parseInt(lexema), linea));
+                        estado = 0;
+                        lexema = "";
+                        i--;
+                    }
+                    break;
+
+                case 9:
+                    if (preanalisis == '=') {
+                        lexema += preanalisis;
+                        tokens.add(new Token(TipoToken.EQUALS, lexema, linea));
+                    } else {
+                        tokens.add(new Token(TipoToken.ASSIGN, lexema, linea));
+                        i--;
+                    }
+                    estado = 0;
+                    lexema = "";
+                    break;
             }
         }
 
-        // Agregar el token EOF al final
         tokens.add(new Token(TipoToken.EOF, "$", linea));
-
         return tokens;
     }
 
@@ -188,8 +140,8 @@ public class Lector {
             case '}': return TipoToken.RIGHT_BRACE;
             case ',': return TipoToken.COMA;
             case ';': return TipoToken.SEMICOLON;
-            default: throw new IllegalArgumentException("Carácter de puntuación no reconocido: " + c);
+            default:
+                throw new IllegalArgumentException("Carácter de puntuación no reconocido: " + c);
         }
     }
-
 }
