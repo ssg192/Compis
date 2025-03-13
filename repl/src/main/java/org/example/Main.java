@@ -33,11 +33,11 @@ public class Main {
                 break;
             }
 
-                Lector lector = new Lector(entrada);
-                List<Token> tokens = lector.scan();
-                for (Token token : tokens) {
-                    System.out.println(token);
-                }
+            Lector lector = new Lector(entrada);
+            List<Token> tokens = lector.scan();
+            for (Token token : tokens) {
+                System.out.println(token);
+            }
         }
         entradaTerminal.close();
     }
@@ -58,11 +58,11 @@ public class Main {
         Scanner lecturaArchivo = new Scanner(archivo);
         while (lecturaArchivo.hasNextLine()) {
             String linea = lecturaArchivo.nextLine();
-                Lector lector = new Lector(linea);
-                List<Token> tokens = lector.scan();
-                for (Token token : tokens) {
-                    System.out.println(token);
-                }
+            Lector lector = new Lector(linea);
+            List<Token> tokens = lector.scan();
+            for (Token token : tokens) {
+                System.out.println(token);
+            }
         }
         lecturaArchivo.close();
     }

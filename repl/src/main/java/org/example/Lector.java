@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Lector {
-
     private final String usuario_oracion;
     private final List<Token> tokens = new ArrayList<>();
     private static final Map<String, TipoToken> palabrasReservadas;
@@ -58,23 +57,27 @@ public class Lector {
                         tokens.add(new Token(TipoToken.OR, "||", linea));
                         i++;
                     } else if (Character.isLetter(preanalisis)) {
-                        estado = 6;
+                        estado = 6; // Identificadores y palabras reservadas
                         lexema = "" + preanalisis;
                     } else if (preanalisis == '"') {
-                        estado = 7;
+                        estado = 7; // Cadenas
                         lexema = "";
                     } else if (esSignoPuntuacion(preanalisis)) {
                         tokens.add(new Token(getTipoSignoPuntuacion(preanalisis), Character.toString(preanalisis), linea));
                     } else if (Character.isDigit(preanalisis)) {
-                        estado = 8;
+                        estado = 8; // Números
                         lexema = "" + preanalisis;
                     } else if (preanalisis == '=') {
-                        estado = 9;
+                        estado = 9; // Asignación
                         lexema = "" + preanalisis;
+                    } else if (preanalisis == '*') {
+                        tokens.add(new Token(TipoToken.STAR, "*", linea));
+                    } else {
+                        throw new Exception("Carácter inesperado '" + preanalisis + "' en la línea " + linea);
                     }
                     break;
 
-                case 6:
+                case 6: // Identificadores y palabras reservadas
                     if (Character.isLetterOrDigit(preanalisis)) {
                         lexema += preanalisis;
                     } else {
@@ -85,45 +88,58 @@ public class Lector {
                         }
                         estado = 0;
                         lexema = "";
-                        i--;
+                        i--; // Regresar al estado anterior
                     }
                     break;
 
-                case 7:
+                case 7: // Cadenas
                     if (preanalisis == '"') {
-                        tokens.add(new Token(TipoToken.QUOTES, lexema, lexema, linea));
-                        estado = 0;
+                        tokens.add(new Token(TipoToken.CADENA, lexema, lexema, linea));
+                        estado = 0; // Regresar al estado inicial
                         lexema = "";
                     } else {
                         lexema += preanalisis;
                     }
                     break;
 
-                case 8:
+                case 8: // Números
                     if (Character.isDigit(preanalisis)) {
                         lexema += preanalisis;
+                    } else if (preanalisis == 'E' || preanalisis == 'e') {
+                        lexema += preanalisis; // Manejar notación científica
+                        estado = 10; // Cambiar a estado para exponentes
                     } else {
-                        tokens.add(new Token(TipoToken.NUMBER, lexema, Integer.parseInt(lexema), linea));
+                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea)); // Almacenar como String
                         estado = 0;
                         lexema = "";
-                        i--;
+                        i--; // Regresar al carácter anterior
                     }
                     break;
 
-                case 9:
+                case 9: // Asignación
                     if (preanalisis == '=') {
                         lexema += preanalisis;
                         tokens.add(new Token(TipoToken.EQUALS, lexema, linea));
                     } else {
                         tokens.add(new Token(TipoToken.ASSIGN, lexema, linea));
-                        i--;
+                        i--; // Regresar al carácter anterior
                     }
                     estado = 0;
                     lexema = "";
                     break;
+
+                case 10: // Manejo de exponentes
+                    if (Character.isDigit(preanalisis)) {
+                        lexema += preanalisis;
+                    } else {
+                        tokens.add(new Token(TipoToken.NUMBER, lexema, lexema, linea)); // Almacenar como String
+                        estado = 0;
+                        lexema = "";
+                        i--; // Regresar al carácter anterior
+                    }
+                    break;
             }
         }
-
         tokens.add(new Token(TipoToken.EOF, "$", linea));
         return tokens;
     }
